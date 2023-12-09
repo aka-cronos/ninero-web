@@ -4,6 +4,7 @@ export default function Nav() {
   return (
     <nav className='flex gap-8 p-4'>
       <Link href="/">Inicio</Link>
+      <Link href="/login">Login</Link>
     </nav>
   )
 }
