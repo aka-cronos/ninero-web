@@ -1,5 +1,9 @@
 'use client'
+
+import { useRouter } from 'next/navigation'
 import { Formik, Field, Form, FormikHelpers, ErrorMessage } from 'formik'
+import useLogin from '@/queries/useLogin'
+import useMe from '@/queries/useMe'
 import SchemaLogin from './schema'
 
 type Values = {
@@ -8,6 +12,23 @@ type Values = {
 }
 
 export default function Login() {
+  const { push } = useRouter()
+  const { mutate } = useLogin()
+  const { data: user } = useMe()
+
+  const onSubmit = (values) => {
+    mutate(values, {
+      onSuccess: () => {
+        console.log(values)
+        push('/')
+      },
+    })
+  }
+
+  if (user) {
+    push('/')
+  }
+
   return (
     <main className="flex flex-col items-center	p-24">
       <h1 className="mb-8">Login Page</h1>
@@ -18,15 +39,7 @@ export default function Login() {
           password: '',
         }}
         validationSchema={SchemaLogin}
-        onSubmit={(
-          values: Values,
-          { setSubmitting }: FormikHelpers<Values>
-        ) => {
-          setTimeout(() => {
-            alert(JSON.stringify(values, null, 2))
-            setSubmitting(false)
-          }, 500)
-        }}
+        onSubmit={onSubmit}
       >
         {({ errors, touched }) => (
           <Form className="min-[300px]: flex flex-col gap-4">
