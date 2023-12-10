@@ -30,7 +30,7 @@ export default function Login() {
   }
 
   return (
-    <main className="flex justify-center">
+    <main className="flex justify-center pt-14">
       <Formik
         initialValues={{
           email: '',
