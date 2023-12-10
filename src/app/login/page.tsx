@@ -1,9 +1,9 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { Formik, Field, Form, ErrorMessage } from 'formik'
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
 import useLogin from '@/queries/useLogin'
-import useMe from '@/queries/useMe'
 import SchemaLogin from './schema'
 import errorMessage from '@/util/errorMessage'
 
@@ -13,9 +13,19 @@ type Values = {
 }
 
 export default function Login() {
-  const { push } = useRouter()
   const { mutate, isPending, error } = useLogin()
-  const { data: user } = useMe()
+  const { push } = useRouter()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+    resolver: yupResolver(SchemaLogin),
+  })
 
   const onSubmit = (values: Values) => {
     mutate(values, {
@@ -25,69 +35,57 @@ export default function Login() {
     })
   }
 
-  if (user) {
-    push('/')
-  }
-
   return (
     <main className="flex justify-center pt-14">
-      <Formik
-        initialValues={{
-          email: '',
-          password: '',
-        }}
-        validationSchema={SchemaLogin}
-        onSubmit={onSubmit}
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex w-1/2 max-w-xl flex-col gap-4"
       >
-        {() => (
-          <Form className="flex w-1/2 max-w-xl flex-col gap-4 ">
-            <h1 className="mb-8 text-center">Login Page</h1>
+        <h1 className="mb-8 text-center">Login Page</h1>
 
-            <div className="flex flex-col">
-              <label htmlFor="email">Correo</label>
-              <Field
-                id="email"
-                name="email"
-                className="h-12 rounded border border-gray-400 px-6"
-                placeholder="correo@email.com"
-              />
+        <div className="flex flex-col">
+          <label htmlFor="email">Correo</label>
+          <input
+            id="email"
+            className="h-12 rounded border border-gray-400 px-6"
+            placeholder="correo@email.com"
+            {...register('email')}
+          />
 
-              <ErrorMessage name="email">
-                {(msg) => <div className="text-red-800">{msg}</div>}
-              </ErrorMessage>
-            </div>
+          {errors.email && (
+            <span className="text-red-800">{errors.email?.message}</span>
+          )}
+        </div>
 
-            <div className="flex flex-col">
-              <label htmlFor="password">Contraseña</label>
-              <Field
-                id="password"
-                name="password"
-                type="password"
-                className="h-12 rounded border border-gray-400 px-6"
-                placeholder="Tu contraseña"
-              />
+        <div className="flex flex-col">
+          <label htmlFor="password">Contraseña</label>
+          <input
+            id="password"
+            type="password"
+            className="h-12 rounded border border-gray-400 px-6"
+            placeholder="Tu contraseña"
+            {...register('password')}
+          />
 
-              <ErrorMessage name="password">
-                {(msg) => <div className="text-red-800">{msg}</div>}
-              </ErrorMessage>
-            </div>
+          {errors.password && (
+            <span className="text-red-800">{errors.password?.message}</span>
+          )}
+        </div>
 
-            {error && (
-              <div className="text-red-800">
-                {errorMessage(error.request.status)}
-              </div>
-            )}
-
-            <button
-              className="mt-6 h-12 rounded border border-gray-400 px-6"
-              type="submit"
-              disabled={isPending}
-            >
-              {isPending ? 'Loading...' : 'Submit'}
-            </button>
-          </Form>
+        {error && (
+          <div className="text-red-800">
+            {errorMessage(error.request.status)}
+          </div>
         )}
-      </Formik>
+
+        <button
+          className="mt-6 h-12 rounded border border-gray-400 px-6"
+          type="submit"
+          disabled={isPending}
+        >
+          {isPending ? 'Loading...' : 'Submit'}
+        </button>
+      </form>
     </main>
   )
 }

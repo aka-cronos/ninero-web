@@ -6,13 +6,13 @@ import useMe from '@/queries/useMe'
 import useLogout from '@/queries/useLogut'
 
 export default function Nav() {
-  const router = useRouter()
+  const { push } = useRouter()
   const { mutateAsync } = useLogout()
   const { data: user } = useMe()
 
   const handleLogout = () => {
     mutateAsync()
-      .then((res) => router.push('/'))
+      .then((res) => push('/'))
       .catch((err) => console.error(err?.response?.data))
   }
 
