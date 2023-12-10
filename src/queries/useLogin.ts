@@ -14,9 +14,6 @@ const useLogin = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['me'] })
     },
-    onError: (error) => {
-      console.error(error?.response?.data)
-    },
   })
 }
 

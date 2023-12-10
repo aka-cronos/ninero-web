@@ -1,10 +1,11 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { Formik, Field, Form, FormikHelpers, ErrorMessage } from 'formik'
+import { Formik, Field, Form, ErrorMessage } from 'formik'
 import useLogin from '@/queries/useLogin'
 import useMe from '@/queries/useMe'
 import SchemaLogin from './schema'
+import errorMessage from '@/util/errorMessage'
 
 type Values = {
   email: string
@@ -13,13 +14,12 @@ type Values = {
 
 export default function Login() {
   const { push } = useRouter()
-  const { mutate } = useLogin()
+  const { mutate, isPending, error } = useLogin()
   const { data: user } = useMe()
 
-  const onSubmit = (values) => {
+  const onSubmit = (values: Values) => {
     mutate(values, {
       onSuccess: () => {
-        console.log(values)
         push('/')
       },
     })
@@ -30,9 +30,7 @@ export default function Login() {
   }
 
   return (
-    <main className="flex flex-col items-center	p-24">
-      <h1 className="mb-8">Login Page</h1>
-
+    <main className="flex justify-center">
       <Formik
         initialValues={{
           email: '',
@@ -41,8 +39,10 @@ export default function Login() {
         validationSchema={SchemaLogin}
         onSubmit={onSubmit}
       >
-        {({ errors, touched }) => (
-          <Form className="min-[300px]: flex flex-col gap-4">
+        {() => (
+          <Form className="flex w-1/2 max-w-xl flex-col gap-4 ">
+            <h1 className="mb-8 text-center">Login Page</h1>
+
             <div className="flex flex-col">
               <label htmlFor="email">Correo</label>
               <Field
@@ -72,11 +72,18 @@ export default function Login() {
               </ErrorMessage>
             </div>
 
+            {error && (
+              <div className="text-red-800">
+                {errorMessage(error.request.status)}
+              </div>
+            )}
+
             <button
               className="mt-6 h-12 rounded border border-gray-400 px-6"
               type="submit"
+              disabled={isPending}
             >
-              Submit
+              {isPending ? 'Loading...' : 'Submit'}
             </button>
           </Form>
         )}

@@ -9,8 +9,7 @@ export default function Nav() {
   return (
     <nav className="flex gap-8 p-4">
       <Link href="/">Inicio</Link>
-      {!user && <Link href="/login">Login</Link>}
-      {user && <p>Hola {user.name}</p>}
+      {user ? <p>Hola {user.name}</p> : <Link href="/login">Login</Link>}
     </nav>
   )
 }

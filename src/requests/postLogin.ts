@@ -1,6 +1,11 @@
 import axios from 'axios'
 
-const postLogin = async (loginValues) => {
+type Values = {
+  email: string
+  password: string
+}
+
+const postLogin = async (loginValues: Values) => {
   const { data } = await axios.post(`/payload/users/login`, loginValues)
   return data
 }

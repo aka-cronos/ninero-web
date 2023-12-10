@@ -1,10 +1,11 @@
 import getMe from '@/requests/getMe'
-import { useQuery } from 'react-query'
+import { useQuery } from '@tanstack/react-query'
 
 const useMe = () => {
-  return useQuery(['me'], () => getMe(), {
+  return useQuery({
+    queryKey: ['me'],
+    queryFn: () => getMe(),
     staleTime: Infinity,
-    onError: (err) => console.error(err?.response?.data),
   })
 }
 
